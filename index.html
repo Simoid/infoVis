@@ -5,9 +5,14 @@
     </head>
     <body>
         <h1>First Head</h1>
-
-        <svg class="bar-chart"></svg>
-        <svg class="data-chart"></svg>
+        <p>Sort by skill:</p>
+        <select class="filter" onchange="update_data(this.value)">
+          <option value="CompSci" selected="selected">Computer Science</option>
+          <option value="Art">Art</option>
+          <option value="Math">Math</option>
+          <option value="Team">Teamwork</option>
+          <option value="Interaction">Interaction</option>
+        </select>
 
         <div class="graph-div">
           <svg class="graph-svg"></svg>

@@ -1,0 +1,22 @@
+body{
+  /*background-color: rgb(51, 51, 51);*/
+}
+
+.graph-lines{
+  fill: none;
+  stroke: grey;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.grid{
+
+}
+
+.x-axis{
+
+}
+
+.y-axis{
+
+}
