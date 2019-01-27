@@ -90,6 +90,7 @@ function init(){
   y_axis = d3.axisLeft().ticks(MAX_TOTAL/11).scale(y_scale);
   graph.append('g').attr('class','x-axis').attr('transform','translate(50,' + y_offset + ')').call(x_axis);
   graph.append('g').attr('class', 'y-axis').attr('transform','translate(50,10)').call(y_axis);
+  graph.append('text').text('Total skillpoints').attr('x',graphWidth- 20).attr('y',graphHeight+80);
 
   graph.append("g")			
   .attr("class", "grid-lines-x")
@@ -131,7 +132,7 @@ function init(){
 
 function drawRadar(){
 
-  var stringList = ["Total", "Computer\nScience", "Art", "Teamwork", "Interaction", "Mathematics"];
+  var stringList = ["Total", "Teamwork", "Art", "Computer Science", "Interaction", "Mathematics"];
 
   for(var i = 0; i < 6; i++){
     var newX = Math.cos(i*2*Math.PI/6 - Math.PI/2)* radarWidth/2.5 + radarWidth/2; 
@@ -142,7 +143,8 @@ function drawRadar(){
     .attr('x1',radarWidth/2)
     .attr('y1',radarHeight/2)
     .attr('stroke','black')
-    .attr('stroke-width', 2); 
+    .attr('stroke-width', 2)
+    .attr('opacity', 1); 
 
     d3.select(".radar-svg").append('text').text(stringList[i]).attr('class','radar-text')
     .attr('z-index',-100)
@@ -163,7 +165,7 @@ function updateRadar(){
   var interactionRatio = selectedUser.Interaction/MAX_INTERACION;
   var mathRatio = selectedUser.Math/MAX_MATH;
   var totalRatio = selectedUser.Total/MAX_TOTAL;
-  var scores = [totalRatio,compSciRatio,artRatio,teamRatio,interactionRatio,mathRatio];
+  var scores = [totalRatio,teamRatio,artRatio,compSciRatio,interactionRatio,mathRatio];
 
   var polygonString = "";
 
@@ -174,7 +176,7 @@ function updateRadar(){
   }
 
 
-  d3.select(".scorePolygon").attr('points',polygonString).attr('opacity', 0.5).attr('fill','orange');
+  d3.select(".scorePolygon").transition().delay(50).attr('points',polygonString).attr('opacity', 0.5).attr('fill','orange').attr('stroke','red');
 
   console.log(scores);
 }
@@ -182,6 +184,10 @@ function updateRadar(){
 function handleGraphClick(d,i){
   selectedUser = d;
   d3.select(".selected-name").text(d.Name);
+  d3.select(".major").text(d.Major);
+  d3.select(".degree").text(d.Degree);
+  d3.select(".hobbies").text(d.Hobbies);
+  d3.select(".expectations").text(d.Expectations);
   updateRadar();
   return;
 }
