@@ -1,12 +1,24 @@
 body{
   /*background-color: rgb(51, 51, 51);*/
+  font-family: 'proxima-nova', sans-serif;
+}
+
+.graph-text{
+  pointer-events:none;
+  z-index: 2;
+  position: fixed;
 }
 
 .graph-lines{
-  fill: none;
-  stroke: grey;
-  stroke-width: 1;
-  shape-rendering: crispEdges;
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges
+}
+
+line{
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges
 }
 
 .grid{
@@ -19,4 +31,13 @@ body{
 
 .y-axis{
 
+}
+
+.container{
+  display: flex;
+  flex-direction: row;
+}
+
+.details{
+  border-left: 1px solid black;
 }

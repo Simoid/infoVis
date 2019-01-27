@@ -18,6 +18,11 @@ const MAX_MATH = 20;
 const MAX_TEAM = 20;
 const MAX_INTERACION = 30;
 
+var radarWidth = 500;
+var radarHeight = 500;
+
+var selectedUser = null;
+
 var maxArray = [];
 maxArray["CompSci"] = MAX_COMPSCI;
 maxArray["Art"] = MAX_ART;
@@ -29,7 +34,7 @@ var horizontalMult = graphWidth/MAX_TOTAL;
 var verticalMult = graphHeight/MAX_COMPSCI;
 var selectedCategory = "CompSci";
 var currentMax = MAX_COMPSCI;
-var y_offset = 20 + graphHeight;
+var y_offset = 40 + graphHeight;
 var x_scale;
 var y_scale;
 var x_axis;
@@ -73,6 +78,11 @@ function init(){
   format_data(bigData);
   add_total_skills(bigData);
   console.log(selectedCategory);
+  selectedUser = bigData[0];
+  console.log(bigData[0]);
+
+  d3.select('.radar-svg').attr('height', radarHeight).attr('width', radarWidth);
+
 
   x_scale = d3.scaleLinear().domain([0,MAX_TOTAL]).range([0,graphWidth]);
   y_scale = d3.scaleLinear().domain([currentMax,0]).range([0,graphHeight]);
@@ -81,10 +91,29 @@ function init(){
   graph.append('g').attr('class','x-axis').attr('transform','translate(50,' + y_offset + ')').call(x_axis);
   graph.append('g').attr('class', 'y-axis').attr('transform','translate(50,10)').call(y_axis);
 
+  graph.append("g")			
+  .attr("class", "grid-lines-x")
+  .attr("transform", "translate(50," + y_offset + ")")
+  .call(make_x_gridlines()
+      .tickSize(-graphHeight)
+      .tickFormat("")
+  )
 
-  var dataSkills = graph.selectAll('circle').data(bigData).enter().append('g').append('circle')
+  // add the Y gridlines
+  graph.append("g")			
+    .attr("class", "grid-lines-y")
+    .attr("transform", "translate(50, "+ 40+")")
+    .call(make_y_gridlines()
+        .tickSize(-graphWidth)
+        .tickFormat("")
+    )
+
+  var dataSkills = graph.selectAll('circle').data(bigData).enter().append('g').attr('class','circle-g').append('circle')
     .attr('r', svgRadius)
     .attr('fill', svgColor)
+    .attr('id', function(d,i){
+      return i;
+    })
     .attr('cx', function(d){
       return d.Total * horizontalMult;
     })
@@ -93,7 +122,68 @@ function init(){
       return graphHeight + 10 - d[selectedCategory] * verticalMult;
     })
     .on("mouseover",handleMouseOver)
-    .on('mouseout',handleMouseOut);
+    .on('mouseout',handleMouseOut)
+    .on('click', handleGraphClick);
+
+    drawRadar();
+    
+}
+
+function drawRadar(){
+
+  var stringList = ["Total", "Computer\nScience", "Art", "Teamwork", "Interaction", "Mathematics"];
+
+  for(var i = 0; i < 6; i++){
+    var newX = Math.cos(i*2*Math.PI/6 - Math.PI/2)* radarWidth/2.5 + radarWidth/2; 
+    var newY = Math.sin(i*2*Math.PI/6 - Math.PI/2)*radarWidth/2.5 + radarHeight/2;
+    d3.select(".radar-svg").append('line')
+    .attr('x2', newX)
+    .attr('y2', newY)
+    .attr('x1',radarWidth/2)
+    .attr('y1',radarHeight/2)
+    .attr('stroke','black')
+    .attr('stroke-width', 2); 
+
+    d3.select(".radar-svg").append('text').text(stringList[i]).attr('class','radar-text')
+    .attr('z-index',-100)
+    .attr('y', newY)
+    .attr('x', newX);
+  }
+
+  updateRadar();
+}
+
+function updateRadar(){
+  if(selectedUser == null){
+    return;
+  }
+  var compSciRatio = selectedUser.CompSci/MAX_COMPSCI;
+  var artRatio = selectedUser.Art/MAX_ART;
+  var teamRatio = selectedUser.Team/MAX_TEAM;
+  var interactionRatio = selectedUser.Interaction/MAX_INTERACION;
+  var mathRatio = selectedUser.Math/MAX_MATH;
+  var totalRatio = selectedUser.Total/MAX_TOTAL;
+  var scores = [totalRatio,compSciRatio,artRatio,teamRatio,interactionRatio,mathRatio];
+
+  var polygonString = "";
+
+  d3.select('.radar-svg').append('polygon').attr('class','scorePolygon');
+  
+  for(var i = 0; i < 6; i++){
+    polygonString = polygonString + " " +(Math.cos(i*2*Math.PI/6 - Math.PI/2) * radarWidth/2.5*scores[i] + radarWidth/2)+ "," + (Math.sin(i*2*Math.PI/6 - Math.PI/2)*radarWidth/2.5*scores[i] + radarHeight/2);
+  }
+
+
+  d3.select(".scorePolygon").attr('points',polygonString).attr('opacity', 0.5).attr('fill','orange');
+
+  console.log(scores);
+}
+
+function handleGraphClick(d,i){
+  selectedUser = d;
+  d3.select(".selected-name").text(d.Name);
+  updateRadar();
+  return;
 }
 
 function get_data(){
@@ -112,7 +202,22 @@ function update_data(selectedCategory){
   verticalMult = graphHeight/maxArray[selectedCategory];
   y_scale = d3.scaleLinear().domain([maxArray[selectedCategory],0]).range([0,graphHeight]);
   y_axis = d3.axisLeft().ticks(maxArray[selectedCategory]/2).scale(y_scale);
-  graph.select('.y-axis').attr('transform','translate(50,20)').call(y_axis);
+  graph.select('.y-axis').attr('transform','translate(50,40)').call(y_axis);
+
+  graph.select(".grid-lines")				
+  .attr("transform", "translate(50," + y_offset + ")")
+  .call(make_x_gridlines()
+      .tickSize(-graphHeight)
+      .tickFormat("")
+  )
+
+  // add the Y gridlines
+  graph.select(".grid-lines-y")			
+    .attr("transform", "translate(50, "+ 40+")")
+    .call(make_y_gridlines()
+        .tickSize(-graphWidth)
+        .tickFormat("")
+    )
 
   var dataSkills = graph.selectAll('circle')
     .transition()
@@ -126,17 +231,47 @@ function update_data(selectedCategory){
     })
     .attr('cy', function(d){
       console.log(d[selectedCategory]);
-      return y_offset - d[selectedCategory] * verticalMult - 10;
+      return y_offset - d[selectedCategory] * verticalMult;
     });
+
+      // add the X gridlines
+      updateRadar();
+}
+
+function make_x_gridlines() {		
+  return d3.axisBottom(x_scale);
+}
+
+// gridlines in y axis function
+function make_y_gridlines() {		
+  return d3.axisLeft(y_scale);
 }
 
 function handleMouseOver(d,i){
+  var id = d3.select(this).attr('id');
+  
   d3.select(this).attr('fill','orange').attr('r',svgRadius*1.5);
-  d3.select('.x-axis').append('text').text("ass").attr('fill','black');
+ 
+  var box_width = bigData[id].Name.length*11;
+  d3.select(this.parentNode.parentNode).append('rect')
+    .attr('class','text-box')
+    .attr('width',box_width)
+    .attr('height',20)
+    .attr('fill',"white")
+    .attr('fill-opacity', 0.8)
+    .attr('y',d3.select(this).attr('cy')-35)
+    .attr('x',d3.select(this).attr('cx')-box_width/2);
+    
+  d3.select(this.parentNode.parentNode).append('text').text(bigData[id].Name).attr('class','graph-text')
+    .attr('z-index',-100)
+    .attr('y',d3.select(this).attr('cy')-20)
+    .attr('x', d3.select(this).attr('cx') - 10 - bigData[id].Name.length*3);
 }
 
 function handleMouseOut(d,i){
   d3.select(this).attr('fill',svgColor).attr('r',svgRadius);
+  d3.select(this.parentNode.parentNode).select('.text-box').remove();
+  d3.select(this.parentNode.parentNode).select('.graph-text').remove();
 }
 
 function format_data(data){

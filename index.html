@@ -4,21 +4,34 @@
         <title>Learning D3 js</title>
     </head>
     <body>
-        <h1>First Head</h1>
-        <p>Sort by skill:</p>
-        <select class="filter" onchange="update_data(this.value)">
-          <option value="CompSci" selected="selected">Computer Science</option>
-          <option value="Art">Art</option>
-          <option value="Math">Math</option>
-          <option value="Team">Teamwork</option>
-          <option value="Interaction">Interaction</option>
-        </select>
+        <div class="container">
+            <div class="item">
+                <h1>Team builder</h1>
+                <p>Sort by skill:</p>
+                <select class="filter" onchange="update_data(this.value)">
+                    <option value="CompSci" selected="selected">Computer Science</option>
+                    <option value="Art">Art</option>
+                    <option value="Math">Math</option>
+                    <option value="Team">Teamwork</option>
+                    <option value="Interaction">Interaction</option>
+                </select>
+        
+                <div class="graph-div">
+                    <svg class="graph-svg"></svg>
+                </div>
+                <div class="data-div"></div>
+            </div>
+            <div class="details item">
+                <h1 class="selected-name">Name</h1>
+                <div class="radar-div">
+                    <svg class="radar-svg">
 
-        <div class="graph-div">
-          <svg class="graph-svg"></svg>
+                    </svg>
+                </div>
+            </div>
         </div>
-        <div class="data-div"></div>
-
+     
+    
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
