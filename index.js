@@ -133,8 +133,16 @@ function init(){
     .on('mouseout',handleMouseOut)
     .on('click', handleGraphClick);
 
+    d3.select('.requirement').text(function(d){
+      if(remainingStudents%5 == 0){
+        return "Requires 5 students";
+      }else{
+        return "Requires 6 students";
+      }
+    });
+
     drawRadar();
-    
+
 }
 
 function clickAdd(){
@@ -174,6 +182,13 @@ function clickComplete(){
     remainingStudents = remainingStudents - teamMembers;
     teamMembers = 0;
     console.log(bigData);
+    d3.select('.requirement').text(function(d){
+      if(remainingStudents%5 == 0){
+        return "Requires 5 students";
+      }else{
+        return "Requires 6 students";
+      }
+    });
   }else{
     alert("You need a team of " + teamLimit + " students!");
   }
