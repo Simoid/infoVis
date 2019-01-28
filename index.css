@@ -28,10 +28,52 @@ body{
   justify-self: flex-end;
 }
 
+.-div{
+  border-top: 1px solid black;
+}
+
+.header{
+  display:flex;
+  justify-content: space-between;
+  height: 200px;
+}
+
+.member-container{
+  display: flex;
+  flex-direction: column;
+}
+
+.member-element{
+  margin: 0px;
+  font-size: 12pt;
+}
+
+.member-head{
+  margin-bottom: 0px;
+}
+
+.complete-button{
+  padding: 10px;
+  margin-right:100px;
+  margin-top:100px;
+
+}
+
 .radar-div{
   border-top: 1px solid black;
 }
 
+.team-status{
+  margin-right: 50px;
+}
+
+.filter{
+  font-size: 12pt;
+}
+
+.-svg{
+  width: 100%;
+}
 .graph-text{
   pointer-events:none;
   z-index: 2;

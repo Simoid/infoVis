@@ -6,16 +6,29 @@
     <body>
         <div class="container">
             <div class="item">
-                <h1>Team builder</h1>
-                <p>Sort by skill:</p>
-                <select class="filter" onchange="update_data(this.value)">
-                    <option value="CompSci" selected="selected">Computer Science</option>
-                    <option value="Art">Art</option>
-                    <option value="Math">Math</option>
-                    <option value="Team">Teamwork</option>
-                    <option value="Interaction">Interaction</option>
-                </select>
-        
+                <div class="header">
+                    <div>
+                        <h1>Team builder</h1>
+                        <p>Sort by skill:</p>
+                        <select class="filter" onchange="update_data(this.value)">
+                            <option value="CompSci" selected="selected">Computer Science</option>
+                            <option value="Art">Art</option>
+                            <option value="Math">Math</option>
+                            <option value="Team">Teamwork</option>
+                            <option value="Interaction">Interaction</option>
+                        </select>
+                    </div>
+                    <div>
+                        <h2 class="member-head">Members:</h2>
+                        <ol type="1" class="member-list">
+
+                        </ol>
+                    </div>
+                    <div class="member-container">
+                        <button class="complete-button" onclick="clickComplete()">Complete team!</button>
+                    </div>
+                </div>
+                
                 <div class="graph-div">
                     <svg class="graph-svg"></svg>
                 </div>
@@ -36,9 +49,6 @@
                         <span class=""><b>Expectations: </b></span><span class="expectations"></span></br>
                     </div>
                     
-                        
-                    <div></div>
-                
                     <div class="radar-div">
                         <svg class="radar-svg">
     

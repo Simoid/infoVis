@@ -23,6 +23,10 @@ var radarHeight = 500;
 
 var selectedUser = null;
 
+var teamMemberList =[];
+var teamMembers = 0;
+
+
 var maxArray = [];
 maxArray["CompSci"] = MAX_COMPSCI;
 maxArray["Art"] = MAX_ART;
@@ -48,6 +52,7 @@ var bigData;
 init();
 console.log();
 update_data(selectedCategory);
+var remainingStudents = bigData.length;
 
 /*
 var barChart = svg.selectAll('rect').data(dataset).enter().append('rect')
@@ -79,7 +84,7 @@ function init(){
   add_total_skills(bigData);
   console.log(selectedCategory);
   selectedUser = bigData[0];
-  console.log(bigData[0]);
+  console.log(bigData.length);
 
   d3.select('.radar-svg').attr('height', radarHeight).attr('width', radarWidth);
 
@@ -109,7 +114,10 @@ function init(){
         .tickFormat("")
     )
 
-  var dataSkills = graph.selectAll('circle').data(bigData).enter().append('g').attr('class','circle-g').append('circle')
+  var dataSkills = graph.selectAll('circle').data(bigData).enter().append('g').attr('class', function(d,i){
+    return "circle-g #" + i;
+    })
+     .append('circle')
     .attr('r', svgRadius)
     .attr('fill', svgColor)
     .attr('id', function(d,i){
@@ -119,8 +127,7 @@ function init(){
       return d.Total * horizontalMult;
     })
     .attr('cy', function(d){
-      console.log(d[selectedCategory]);
-      return graphHeight + 10 - d[selectedCategory] * verticalMult;
+      return graphHeight +40- d[selectedCategory] * verticalMult;
     })
     .on("mouseover",handleMouseOver)
     .on('mouseout',handleMouseOut)
@@ -130,8 +137,49 @@ function init(){
     
 }
 
-function drawRadar(){
+function clickAdd(){
+  if(selectedUser == null || undefined) return; 
+ 
+  if(teamMemberList.indexOf(selectedUser) >= 0){
+    return;
+  }
 
+  var teamLimit = 6;
+  if(remainingStudents % 5 == 0){
+    teamLimit = 5;
+  }
+
+  console.log(teamLimit);
+
+  if(teamMembers < teamLimit){
+    teamMemberList.push(selectedUser);
+    teamMembers++;
+    d3.select('.member-list').append('li').attr('class','list-item').attr('onclick','console.log("ha")').text(selectedUser.Name);
+  }else{
+    alert("You need a team of " + teamLimit + " students!");
+  } 
+}
+
+function clickComplete(){
+  var teamLimit = 6;
+  if(remainingStudents % 5 == 0){
+    teamLimit = 5;
+  }
+
+  if(teamMembers == teamLimit){
+    d3.selectAll('.list-item').remove();
+    for(var i = 0; i < teamMemberList.length; i++){
+      d3.selectAll('[id="' + teamMemberList[i].ID + '"]').remove();
+    }
+    remainingStudents = remainingStudents - teamMembers;
+    teamMembers = 0;
+    console.log(bigData);
+  }else{
+    alert("You need a team of " + teamLimit + " students!");
+  }
+}
+
+function drawRadar(){
   var stringList = ["Total", "Teamwork", "Art", "Computer Science", "Interaction", "Mathematics"];
 
   for(var i = 0; i < 6; i++){
@@ -156,7 +204,7 @@ function drawRadar(){
 }
 
 function updateRadar(){
-  if(selectedUser == null){
+  if(selectedUser == null || undefined){
     return;
   }
   var compSciRatio = selectedUser.CompSci/MAX_COMPSCI;
@@ -166,6 +214,9 @@ function updateRadar(){
   var mathRatio = selectedUser.Math/MAX_MATH;
   var totalRatio = selectedUser.Total/MAX_TOTAL;
   var scores = [totalRatio,teamRatio,artRatio,compSciRatio,interactionRatio,mathRatio];
+  var skills = [selectedUser.Total,selectedUser.Team, selectedUser.Art, selectedUser.CompSci, selectedUser.Interaction, selectedUser.Math];
+
+  var stringList = ["Total", "Teamwork", "Art", "Computer Science", "Interaction", "Mathematics"];
 
   var polygonString = "";
 
@@ -175,6 +226,9 @@ function updateRadar(){
     polygonString = polygonString + " " +(Math.cos(i*2*Math.PI/6 - Math.PI/2) * radarWidth/2.5*scores[i] + radarWidth/2)+ "," + (Math.sin(i*2*Math.PI/6 - Math.PI/2)*radarWidth/2.5*scores[i] + radarHeight/2);
   }
 
+  d3.selectAll(".radar-text").each(function(d,i){
+    return d3.select(this).text(stringList[i] + " (" + skills[i] + ")").attr('class','radar-text');
+  });
 
   d3.select(".scorePolygon").transition().delay(50).attr('points',polygonString).attr('opacity', 0.5).attr('fill','orange').attr('stroke','red');
 
@@ -282,6 +336,7 @@ function handleMouseOut(d,i){
 
 function format_data(data){
   for(i = 0; i < data.length; i++){
+    data[i].ID = i;
     data[i].CompSci = data[i].ProgSkills + data[i].GraphicsSkills + data[i].RepoSkills;
     data[i].Art = data[i].ArtSkills;
     data[i].Math = data[i].MathSkills + data[i].StatSkills;
